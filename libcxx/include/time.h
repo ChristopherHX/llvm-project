@@ -194,13 +194,7 @@ int nanosleep(const struct timespec *__rqtp, struct timespec *__rmtp) LIBC_ALIAS
 #endif
 #endif /* UNIFDEF_DRIVERKIT */
 
-#if !defined(_DARWIN_FEATURE_CLOCK_GETTIME) || _DARWIN_FEATURE_CLOCK_GETTIME != 0
-#if __DARWIN_C_LEVEL >= 199309L
-#if __has_feature(enumerator_attributes)
-#define __CLOCK_AVAILABILITY __OSX_AVAILABLE(10.12) __IOS_AVAILABLE(10.0) __TVOS_AVAILABLE(10.0) __WATCHOS_AVAILABLE(3.0)
-#else
 #define __CLOCK_AVAILABILITY
-#endif
 
 typedef enum {
 _CLOCK_REALTIME __CLOCK_AVAILABILITY = 0,
