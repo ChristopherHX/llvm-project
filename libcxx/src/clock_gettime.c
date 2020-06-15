@@ -56,8 +56,7 @@ _mach_boottime_usec(uint64_t *boottime, struct timeval *realtime)
     uint64_t bt1 = 0, bt2 = 0;
     int ret;
     do {
-        bt1 = mach_boottime_usec();
-        if (os_slowpath(bt1 == 0)) bt1 = _boottime_fallback_usec();
+        bt1 = _boottime_fallback_usec();
 
         atomic_thread_fence(memory_order_seq_cst);
 
@@ -66,8 +65,7 @@ _mach_boottime_usec(uint64_t *boottime, struct timeval *realtime)
 
         atomic_thread_fence(memory_order_seq_cst);
 
-        bt2 = mach_boottime_usec();
-        if (os_slowpath(bt2 == 0)) bt2 = _boottime_fallback_usec();
+        bt2 = _boottime_fallback_usec();
     } while (os_slowpath(bt1 != bt2));
     *boottime = bt1;
     return 0;
@@ -83,6 +81,10 @@ clock_gettime_nsec_np(clockid_t clock_id)
         if (ret) return 0;
         return timeval2nsec(tv);
     }
+    case CLOCK_MONOTONIC_RAW:
+    case CLOCK_MONOTONIC_RAW_APPROX:
+    case CLOCK_UPTIME_RAW:
+    case CLOCK_UPTIME_RAW_APPROX:
     case CLOCK_MONOTONIC: {
         struct timeval tv;
         uint64_t boottime;
@@ -91,6 +93,7 @@ clock_gettime_nsec_np(clockid_t clock_id)
         boottime *= NSEC_PER_USEC;
         return timeval2nsec(tv) - boottime;
     }
+    case CLOCK_THREAD_CPUTIME_ID:
     case CLOCK_PROCESS_CPUTIME_ID: {
         struct rusage ru;
         int ret = getrusage(RUSAGE_SELF, &ru);
@@ -98,37 +101,9 @@ clock_gettime_nsec_np(clockid_t clock_id)
         return timeval2nsec(ru.ru_utime) + timeval2nsec(ru.ru_stime);
     }
     default:
-        // calls that use mach_absolute_time units fall through into a common path
-        break;
-    }
-
-    // Mach Absolute Time unit-based calls
-    mach_timebase_info_data_t tb_info;
-    if (mach_timebase_info(&tb_info)) return 0;
-    uint64_t mach_time;
-
-    switch(clock_id){
-    case CLOCK_MONOTONIC_RAW:
-        mach_time = mach_continuous_time();
-        break;
-    case CLOCK_MONOTONIC_RAW_APPROX:
-        mach_time = mach_continuous_approximate_time();
-        break;
-    case CLOCK_UPTIME_RAW:
-        mach_time = mach_absolute_time();
-        break;
-    case CLOCK_UPTIME_RAW_APPROX:
-        mach_time = mach_approximate_time();
-        break;
-    case CLOCK_THREAD_CPUTIME_ID:
-        mach_time = __thread_selfusage();
-        break;
-    default:
         errno = EINVAL;
         return 0;
     }
-
-    return (mach_time * tb_info.numer) / tb_info.denom;
 }
 
 int
