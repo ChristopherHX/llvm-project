@@ -94,19 +94,6 @@ struct tm {
 #define CLOCKS_PER_SEC  (__DARWIN_CLK_TCK)
 #endif /* __DARWIN_UNIX03 */
 
-#ifndef __OSX_AVAILABLE
-#define __OSX_AVAILABLE(a)
-#endif
-#ifndef __IOS_PROHIBITED
-#define __IOS_PROHIBITED
-#endif
-#ifndef __TVOS_PROHIBITED
-#define __TVOS_PROHIBITED
-#endif
-#ifndef __WATCHOS_PROHIBITED
-#define __WATCHOS_PROHIBITED
-#endif
-
 #ifndef _ANSI_SOURCE
 extern char *tzname[];
 #endif
@@ -241,8 +228,6 @@ __uint64_t clock_gettime_nsec_np(clockid_t __clock_id);
 int clock_settime(clockid_t __clock_id, const struct timespec *__tp);
 
 #endif /* UNIFDEF_DRIVERKIT */
-#endif /* __DARWIN_C_LEVEL */
-#endif /* _DARWIN_FEATURE_CLOCK_GETTIME */
 
 #ifndef UNIFDEF_DRIVERKIT
 #if (__DARWIN_C_LEVEL >= __DARWIN_C_FULL) && \
