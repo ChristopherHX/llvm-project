@@ -65,7 +65,6 @@
 
 #include <_types.h>
 #include <sys/cdefs.h>
-#include <Availability.h>
 #ifndef UNIFDEF_DRIVERKIT
 #include <sys/_types/_clock_t.h>
 #include <sys/_types/_null.h>
@@ -94,6 +93,19 @@ struct tm {
 
 #define CLOCKS_PER_SEC  (__DARWIN_CLK_TCK)
 #endif /* __DARWIN_UNIX03 */
+
+#ifndef __OSX_AVAILABLE
+#define __OSX_AVAILABLE(a)
+#endif
+#ifndef __IOS_PROHIBITED
+#define __IOS_PROHIBITED
+#endif
+#ifndef __TVOS_PROHIBITED
+#define __TVOS_PROHIBITED
+#endif
+#ifndef __WATCHOS_PROHIBITED
+#define __WATCHOS_PROHIBITED
+#endif
 
 #ifndef _ANSI_SOURCE
 extern char *tzname[];
@@ -194,49 +206,41 @@ int nanosleep(const struct timespec *__rqtp, struct timespec *__rmtp) LIBC_ALIAS
 #endif
 #endif /* UNIFDEF_DRIVERKIT */
 
-#define __CLOCK_AVAILABILITY
-
 typedef enum {
-_CLOCK_REALTIME __CLOCK_AVAILABILITY = 0,
+_CLOCK_REALTIME = 0,
 #define CLOCK_REALTIME _CLOCK_REALTIME
-_CLOCK_MONOTONIC __CLOCK_AVAILABILITY = 6,
+_CLOCK_MONOTONIC = 6,
 #define CLOCK_MONOTONIC _CLOCK_MONOTONIC
 #if !defined(_POSIX_C_SOURCE) || defined(_DARWIN_C_SOURCE)
-_CLOCK_MONOTONIC_RAW __CLOCK_AVAILABILITY = 4,
+_CLOCK_MONOTONIC_RAW = 4,
 #define CLOCK_MONOTONIC_RAW _CLOCK_MONOTONIC_RAW
-_CLOCK_MONOTONIC_RAW_APPROX __CLOCK_AVAILABILITY = 5,
+_CLOCK_MONOTONIC_RAW_APPROX = 5,
 #define CLOCK_MONOTONIC_RAW_APPROX _CLOCK_MONOTONIC_RAW_APPROX
-_CLOCK_UPTIME_RAW __CLOCK_AVAILABILITY = 8,
+_CLOCK_UPTIME_RAW = 8,
 #define CLOCK_UPTIME_RAW _CLOCK_UPTIME_RAW
-_CLOCK_UPTIME_RAW_APPROX __CLOCK_AVAILABILITY = 9,
+_CLOCK_UPTIME_RAW_APPROX = 9,
 #define CLOCK_UPTIME_RAW_APPROX _CLOCK_UPTIME_RAW_APPROX
 #endif
-_CLOCK_PROCESS_CPUTIME_ID __CLOCK_AVAILABILITY = 12,
+_CLOCK_PROCESS_CPUTIME_ID = 12,
 #define CLOCK_PROCESS_CPUTIME_ID _CLOCK_PROCESS_CPUTIME_ID
-_CLOCK_THREAD_CPUTIME_ID __CLOCK_AVAILABILITY = 16
+_CLOCK_THREAD_CPUTIME_ID = 16
 #define CLOCK_THREAD_CPUTIME_ID _CLOCK_THREAD_CPUTIME_ID
 } clockid_t;
 
 #ifndef UNIFDEF_DRIVERKIT
-__CLOCK_AVAILABILITY
 int clock_getres(clockid_t __clock_id, struct timespec *__res);
 
-__CLOCK_AVAILABILITY
 int clock_gettime(clockid_t __clock_id, struct timespec *__tp);
 
 #endif /* UNIFDEF_DRIVERKIT */
 #if !defined(_POSIX_C_SOURCE) || defined(_DARWIN_C_SOURCE)
-__CLOCK_AVAILABILITY
 __uint64_t clock_gettime_nsec_np(clockid_t __clock_id);
 #endif
 
 #ifndef UNIFDEF_DRIVERKIT
-__OSX_AVAILABLE(10.12) __IOS_PROHIBITED
-__TVOS_PROHIBITED __WATCHOS_PROHIBITED
 int clock_settime(clockid_t __clock_id, const struct timespec *__tp);
 
 #endif /* UNIFDEF_DRIVERKIT */
-#undef __CLOCK_AVAILABILITY
 #endif /* __DARWIN_C_LEVEL */
 #endif /* _DARWIN_FEATURE_CLOCK_GETTIME */
 
@@ -246,7 +250,6 @@ int clock_settime(clockid_t __clock_id, const struct timespec *__tp);
         (defined(__cplusplus) && __cplusplus >= 201703L))
 /* ISO/IEC 9899:201x 7.27.2.5 The timespec_get function */
 #define TIME_UTC	1	/* time elapsed since epoch */
-__API_AVAILABLE(macosx(10.15), ios(13.0), tvos(13.0), watchos(6.0))
 int timespec_get(struct timespec *ts, int base);
 #endif
 
